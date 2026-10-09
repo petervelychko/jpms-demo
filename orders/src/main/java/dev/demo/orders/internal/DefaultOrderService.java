@@ -2,7 +2,6 @@ package dev.demo.orders.internal;
 
 import dev.demo.catalog.api.Catalog;
 import dev.demo.catalog.api.CustomerTier;
-import dev.demo.catalog.internal.PricingRules;
 import dev.demo.orders.api.Order;
 import dev.demo.orders.api.OrderLine;
 import dev.demo.orders.api.OrderService;
@@ -27,11 +26,8 @@ public final class DefaultOrderService implements OrderService {
             throw new IllegalArgumentException("Quantity must be greater than zero");
         }
 
-        var product = catalog.find(sku)
-                .orElseThrow(() -> new IllegalArgumentException("Unknown product: " + sku));
-
-        // Intentional architectural violation for the demo: Orders reaches into Catalog internals.
-        BigDecimal unitPrice = PricingRules.priceFor(product.price(), tier);
+        // Fixed architecture: Orders depends only on Catalog's exported API.
+        BigDecimal unitPrice = catalog.priceFor(sku, tier);
         BigDecimal total = unitPrice.multiply(BigDecimal.valueOf(quantity));
 
         var order = new Order(
