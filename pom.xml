@@ -14,6 +14,7 @@
 
     <modules>
         <module>catalog</module>
+        <module>legacy-promotions</module>
         <module>orders</module>
         <module>notifications</module>
         <module>app</module>

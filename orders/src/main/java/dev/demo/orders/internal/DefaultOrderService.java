@@ -6,6 +6,7 @@ import dev.demo.orders.api.Order;
 import dev.demo.orders.api.OrderLine;
 import dev.demo.orders.api.OrderService;
 import dev.demo.orders.internal.persistence.OrderStore;
+import dev.demo.promotions.PromotionEngine;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -13,6 +14,7 @@ import java.util.UUID;
 
 public final class DefaultOrderService implements OrderService {
     private final Catalog catalog;
+    private final PromotionEngine promotions = new PromotionEngine();
     private final OrderStore store;
 
     public DefaultOrderService(Catalog catalog, OrderStore store) {
@@ -27,7 +29,8 @@ public final class DefaultOrderService implements OrderService {
         }
 
         // Fixed architecture: Orders depends only on Catalog's exported API.
-        BigDecimal unitPrice = catalog.priceFor(sku, tier);
+        BigDecimal catalogPrice = catalog.priceFor(sku, tier);
+        BigDecimal unitPrice = promotions.apply(catalogPrice);
         BigDecimal total = unitPrice.multiply(BigDecimal.valueOf(quantity));
 
         var order = new Order(
