@@ -5,4 +5,7 @@ module dev.demo.orders {
     requires com.fasterxml.jackson.core;
 
     exports dev.demo.orders.api;
+
+    opens dev.demo.orders.internal.persistence
+            to com.fasterxml.jackson.databind;
 }
